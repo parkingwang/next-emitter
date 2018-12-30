@@ -55,7 +55,7 @@ bintray {
         name = 'emitter'
         userOrg = 'yoojia'
         licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/yoojia/emitter.git'
+        vcsUrl = 'https://github.com/yoojia/NextEmitter.git'
         version {
             name = rootProject.version
             desc = rootProject.description
@@ -69,11 +69,11 @@ ext {
         resolveStrategy = Closure.DELEGATE_FIRST
         name project.name
         description project.description ?: rootProject.description
-        url 'https://github.com/yoojia/emitter'
+        url 'https://github.com/yoojia/NextEmitter'
         scm {
-            url 'https://github.com/yoojia/emitter.git'
-            connection 'scm:git:git://github.com/yoojia/emitter.git'
-            developerConnection 'scm:git:git@github.com/yoojia/emitter.git'
+            url 'https://github.com/yoojia/NextEmitter.git'
+            connection 'scm:git:git://github.com/yoojia/NextEmitter.git'
+            developerConnection 'scm:git:git@github.com/yoojia/NextEmitter.git'
         }
         licenses {
             license {
