@@ -18,14 +18,14 @@ public class NextEmitter {
     private final Collection<Registration> mRegistrations = new CopyOnWriteArrayList<>();
 
     /**
-     * 调度器，默认实现为多线程调度器
-     */
-    private Scheduler mScheduler = new MultiThreadsScheduler();
-
-    /**
      * 未捕获的异常处理接口
      */
     private Consumer<Throwable> mUncaughtExceptionHandler = Throwable::printStackTrace;
+
+    /**
+     * 调度器，默认实现为多线程调度器
+     */
+    private Scheduler mScheduler = new MultiThreadsScheduler();
 
     /**
      * 查找匹配的Handler
@@ -44,10 +44,11 @@ public class NextEmitter {
     /**
      * 设置未捕获异常处理接口。当 {@link EventHandler#onError(Exception)} 处理异常后依然抛出异常，将由此接口处理。
      *
-     * @param uncaughtExceptionHandler 异常处理接口
+     * @param handler 异常处理接口
      */
-    public void setUncaughtExceptionHandler(Consumer<Throwable> uncaughtExceptionHandler) {
-        mUncaughtExceptionHandler = Objects.requireNonNull(uncaughtExceptionHandler, "uncaughtExceptionHandler == null");
+    public void setUncaughtExceptionHandler(Consumer<Throwable> handler) {
+        mUncaughtExceptionHandler = Objects.requireNonNull(handler, "uncaughtExceptionHandler == null");
+        mScheduler.setUncaughtExceptionHandler(mUncaughtExceptionHandler);
     }
 
     /**
