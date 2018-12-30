@@ -36,13 +36,9 @@ public class NextEmitter {
         public void selectAndFire(VirtualKey key, Event event) {
             find(key).forEach(r -> {
                 try {
-                    r.handler.onEvent(event);
+                    mScheduler.schedule(event, r.handler);
                 } catch (Exception ex) {
-                    try {
-                        r.handler.onError(ex);
-                    } catch (Exception ex1) {
-                        mUncaughtExceptionHandler.accept(ex1);
-                    }
+                    mUncaughtExceptionHandler.accept(ex);
                 }
             });
         }
