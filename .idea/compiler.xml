@@ -2,6 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="net.nextabc.emitter.main" target="1.8" />
+      <module name="net.nextabc.emitter.test" target="1.8" />
       <module name="net.nextabc.reactor.main" target="1.8" />
       <module name="net.nextabc.reactor.test" target="1.8" />
     </bytecodeTargetLevel>

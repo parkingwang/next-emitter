@@ -1,24 +1,22 @@
 buildscript {
     repositories {
+        maven { url "https://maven.aliyun.com/repository/public" }
         jcenter()
-    }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
     }
 }
 
 plugins {
     id 'java'
+    id "com.jfrog.bintray" version "1.8.1"
+    id 'maven'
+    id 'maven-publish'
 }
-
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'maven-publish'
 
 group 'net.nextabc'
 version '0.0.1'
 description = 'A lightweight event-driven library'
 
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     maven { url "https://maven.aliyun.com/repository/central" }
@@ -30,7 +28,14 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-javadoc.options.links("http://docs.oracle.com/javase/8/docs/api/")
+ext {
+    projectGroupId = project.group
+    projectVersion = project.version
+    projectName = rootProject.name
+    projectDesc = "NextEmitter is a event-bus-like library for Java"
+    projectURL = "https://github.com/yoojia/NextEmitter"
+    projectVCS = "https://github.com/yoojia/NextEmitter.git"
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -46,75 +51,99 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/8/docs/api"
+        title projectName
+    }
+}
+
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
 bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('bintrayUser')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('bintrayApiKey')
-    publications = ['maven']
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+
+    publications = ['mavenJava']
+    configurations = ['archives']
+
+    dryRun = false
+    publish = true
+
     pkg {
-        repo = 'emitter'
-        name = 'emitter'
+        repo = 'maven'
+        name = projectName
         userOrg = 'yoojia'
+
         licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/yoojia/NextEmitter.git'
+        vcsUrl = projectVCS
+        labels = ['java', 'emitter', 'event-bus']
+
+        publicDownloadNumbers = true
+
         version {
-            name = rootProject.version
-            desc = rootProject.description
-            released  = new Date()
+            name = projectVersion
+            desc = projectDesc
+            vcsTag = projectVersion
+            attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
         }
     }
 }
 
-ext {
-    pomXml = {
-        resolveStrategy = Closure.DELEGATE_FIRST
-        name project.name
-        description project.description ?: rootProject.description
-        url 'https://github.com/yoojia/NextEmitter'
-        scm {
-            url 'https://github.com/yoojia/NextEmitter.git'
-            connection 'scm:git:git://github.com/yoojia/NextEmitter.git'
-            developerConnection 'scm:git:git@github.com/yoojia/NextEmitter.git'
+def pomConfig = {
+
+    name projectName
+    url projectURL
+    inceptionYear '2018'
+
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
         }
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/license/LICENSE-2.0.txt'
-                distribution 'repo'
-            }
+    }
+
+    developers {
+        developer {
+            id "yoojia"
+            name "yoojia chen"
+            email "yoojiachen@gmail.com"
         }
-        developers {
-            developer {
-                id 'yoojia'
-                name 'Yoojia Chen'
-            }
-        }
+    }
+
+    scm {
+        url projectVCS
     }
 }
 
 publishing {
     publications {
-        maven(MavenPublication) {
+        mavenJava(MavenPublication) {
             from components.java
-            groupId rootProject.group
-            artifactId project.name
-            version rootProject.version
+
+            groupId projectGroupId
+            artifactId projectName
+            version projectVersion
 
             artifact sourcesJar
             artifact javadocJar
 
             pom.withXml {
-                asNode().children().last() + project.pomXml
+                def root = asNode()
+                root.appendNode('description', projectDesc)
+                root.children().last() + pomConfig
             }
         }
     }
+}
 
-    repositories {
-        maven {
-            credentials {
-                username = bintray.user
-                password = bintray.key
-            }
-            url 'http://oss.jfrog.org/artifactory/oss-snapshot-local'
-        }
-    }
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.8'
 }
