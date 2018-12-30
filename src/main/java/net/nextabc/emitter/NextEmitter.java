@@ -28,16 +28,35 @@ public class NextEmitter {
     private Scheduler mScheduler = new MultiThreadsScheduler();
 
     /**
-     * 查找匹配的Handler
+     * 查找匹配的Handler，并执行调度
      */
-    private Selector mSelector = key -> {
-        final List<Registration> selected = new ArrayList<>();
-        for (Registration r : mRegistrations) {
-            if (r.key.matches(key)) {
-                selected.add(r);
-            }
+    private Selector mSelector = new Selector() {
+
+        @Override
+        public void selectAndFire(VirtualKey key, Event event) {
+            find(key).forEach(r -> {
+                try {
+                    r.handler.onEvent(event);
+                } catch (Exception ex) {
+                    try {
+                        r.handler.onError(ex);
+                    } catch (Exception ex1) {
+                        mUncaughtExceptionHandler.accept(ex1);
+                    }
+                }
+            });
         }
-        return selected;
+
+        private Collection<Registration> find(VirtualKey key) {
+            final List<Registration> out = new ArrayList<>();
+            for (Registration r : mRegistrations) {
+                if (r.key.matches(key)) {
+                    out.add(r);
+                }
+            }
+            return out;
+        }
+
     };
 
     /**
@@ -106,13 +125,7 @@ public class NextEmitter {
      * @return NextEmitter
      */
     public NextEmitter emit(VirtualKey key, Event event) {
-        mSelector.select(key).forEach(r -> {
-            try {
-                mScheduler.schedule(event, r.handler);
-            } catch (Exception ex) {
-                mUncaughtExceptionHandler.accept(ex);
-            }
-        });
+        mSelector.selectAndFire(key, event);
         return this;
     }
 
