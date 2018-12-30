@@ -40,15 +40,15 @@ public class NextEmitter {
         return selected;
     };
 
-
     /**
      * 设置未捕获异常处理接口。当 {@link EventHandler#onError(Exception)} 处理异常后依然抛出异常，将由此接口处理。
      *
      * @param handler 异常处理接口
      */
-    public void setUncaughtExceptionHandler(Consumer<Throwable> handler) {
+    public NextEmitter setUncaughtExceptionHandler(Consumer<Throwable> handler) {
         mUncaughtExceptionHandler = Objects.requireNonNull(handler, "uncaughtExceptionHandler == null");
         mScheduler.setUncaughtExceptionHandler(mUncaughtExceptionHandler);
+        return this;
     }
 
     /**
