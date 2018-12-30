@@ -1,0 +1,120 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+
+group 'net.nextabc'
+version '0.0.1'
+description = 'A lightweight event-driven library'
+
+sourceCompatibility = 1.8
+
+repositories {
+    maven { url "https://maven.aliyun.com/repository/central" }
+    maven { url "https://maven.aliyun.com/repository/jcenter" }
+    jcenter()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+javadoc.options.links("http://docs.oracle.com/javase/8/docs/api/")
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('bintrayUser')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('bintrayApiKey')
+    publications = ['maven']
+    pkg {
+        repo = 'emitter'
+        name = 'emitter'
+        userOrg = 'yoojia'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/yoojia/emitter.git'
+        version {
+            name = rootProject.version
+            desc = rootProject.description
+            released  = new Date()
+        }
+    }
+}
+
+ext {
+    pomXml = {
+        resolveStrategy = Closure.DELEGATE_FIRST
+        name project.name
+        description project.description ?: rootProject.description
+        url 'https://github.com/yoojia/emitter'
+        scm {
+            url 'https://github.com/yoojia/emitter.git'
+            connection 'scm:git:git://github.com/yoojia/emitter.git'
+            developerConnection 'scm:git:git@github.com/yoojia/emitter.git'
+        }
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        developers {
+            developer {
+                id 'yoojia'
+                name 'Yoojia Chen'
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            groupId rootProject.group
+            artifactId project.name
+            version rootProject.version
+
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom.withXml {
+                asNode().children().last() + project.pomXml
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            credentials {
+                username = bintray.user
+                password = bintray.key
+            }
+            url 'http://oss.jfrog.org/artifactory/oss-snapshot-local'
+        }
+    }
+}
