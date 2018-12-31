@@ -13,7 +13,7 @@ plugins {
 }
 
 group 'net.nextabc'
-version '0.0.1'
+version '0.0.2'
 description = 'A lightweight event-driven library'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
