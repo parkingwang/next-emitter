@@ -9,11 +9,18 @@ package net.nextabc.emitter;
 public interface Selector {
 
     /**
+     * 绑定Context
+     *
+     * @param context Context
+     */
+    void select(Context context);
+
+    /**
      * 查找匹配事件Key的Handler，并调度执行。
      *
      * @param key   Key
      * @param event Event
      */
-    void selectAndFire(VirtualKey key, Event event);
+    void fire(VirtualKey key, Event event);
 
 }

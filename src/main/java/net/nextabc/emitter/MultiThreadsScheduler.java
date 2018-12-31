@@ -1,8 +1,4 @@
-package net.nextabc.emitter.impl;
-
-import net.nextabc.emitter.Event;
-import net.nextabc.emitter.EventHandler;
-import net.nextabc.emitter.Scheduler;
+package net.nextabc.emitter;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -11,23 +7,30 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
+ * 多线程调度器，使用 {@link ExecutorService} 来执行线程
+ *
  * @author 陈哈哈 (yoojiachen@gmail.com, chenyongjia@parkingwang.com)
  * @version 0.1
  */
 public class MultiThreadsScheduler implements Scheduler {
 
-    private final ExecutorService mThreads = new ThreadPoolExecutor(
-            2,
-            Runtime.getRuntime().availableProcessors() * 2,
-            60,
-            TimeUnit.SECONDS,
-            new LinkedBlockingDeque<>()
-    );
+    private final ExecutorService mThreads;
 
     private Consumer<Throwable> mUncaughtExceptionHandler;
 
-    public MultiThreadsScheduler() {
+    public MultiThreadsScheduler(int coreThreads, int maxThreads) {
+        mThreads = new ThreadPoolExecutor(
+                coreThreads,
+                maxThreads,
+                60,
+                TimeUnit.SECONDS,
+                new LinkedBlockingDeque<>()
+        );
         Runtime.getRuntime().addShutdownHook(new Thread(mThreads::shutdown));
+    }
+
+    public MultiThreadsScheduler() {
+        this(4, Runtime.getRuntime().availableProcessors() * 2);
     }
 
     @Override

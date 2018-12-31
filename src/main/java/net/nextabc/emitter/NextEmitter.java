@@ -1,10 +1,6 @@
 package net.nextabc.emitter;
 
-import net.nextabc.emitter.impl.MultiThreadsScheduler;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -13,47 +9,33 @@ import java.util.function.Consumer;
  * @author 陈哈哈 (yoojiachen@gmail.com, chenyongjia@parkingwang.com)
  * @version 0.1
  */
-public class NextEmitter {
+public class NextEmitter implements Context {
 
     private final Collection<Registration> mRegistrations = new CopyOnWriteArrayList<>();
 
     /**
      * 未捕获的异常处理接口
      */
-    private Consumer<Throwable> mUncaughtExceptionHandler = Throwable::printStackTrace;
+    private Consumer<Throwable> mUncaughtExceptionHandler;
 
     /**
      * 调度器，默认实现为多线程调度器
      */
-    private Scheduler mScheduler = new MultiThreadsScheduler();
+    private Scheduler mScheduler;
 
     /**
      * 查找匹配的Handler，并执行调度
      */
-    private Selector mSelector = new Selector() {
+    private Selector mSelector;
 
-        @Override
-        public void selectAndFire(VirtualKey key, Event event) {
-            find(key).forEach(r -> {
-                try {
-                    mScheduler.schedule(event, r.handler);
-                } catch (Exception ex) {
-                    mUncaughtExceptionHandler.accept(ex);
-                }
-            });
-        }
-
-        private Collection<Registration> find(VirtualKey key) {
-            final List<Registration> out = new ArrayList<>();
-            for (Registration r : mRegistrations) {
-                if (r.key.matches(key)) {
-                    out.add(r);
-                }
-            }
-            return out;
-        }
-
-    };
+    /**
+     * 默认实现
+     */
+    public NextEmitter() {
+        setScheduler(new MultiThreadsScheduler());
+        setSelector(new DefaultSelector());
+        setUncaughtExceptionHandler(Throwable::printStackTrace);
+    }
 
     /**
      * 设置未捕获异常处理接口。当 {@link EventHandler#onError(Exception)} 处理异常后依然抛出异常，将由此接口处理。
@@ -74,6 +56,7 @@ public class NextEmitter {
      */
     public NextEmitter setScheduler(Scheduler scheduler) {
         mScheduler = Objects.requireNonNull(scheduler, "scheduler is null");
+        mSelector.select(this);
         return this;
     }
 
@@ -121,8 +104,27 @@ public class NextEmitter {
      * @return NextEmitter
      */
     public NextEmitter emit(VirtualKey key, Event event) {
-        mSelector.selectAndFire(key, event);
+        mSelector.fire(key, event);
         return this;
     }
 
+    @Override
+    public Collection<Registration> getRegistration() {
+        return mRegistrations;
+    }
+
+    @Override
+    public Consumer<Throwable> getUncaughtExceptionHandler() {
+        return mUncaughtExceptionHandler;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return mScheduler;
+    }
+
+    @Override
+    public Selector getSelector() {
+        return mSelector;
+    }
 }
