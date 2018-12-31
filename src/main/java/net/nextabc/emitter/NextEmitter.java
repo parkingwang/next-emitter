@@ -32,8 +32,8 @@ public class NextEmitter implements Context {
      * 默认实现
      */
     public NextEmitter() {
-        setScheduler(new MultiThreadsScheduler());
         setSelector(new DefaultSelector());
+        setScheduler(new MultiThreadsScheduler());
         setUncaughtExceptionHandler(Throwable::printStackTrace);
     }
 
@@ -56,7 +56,6 @@ public class NextEmitter implements Context {
      */
     public NextEmitter setScheduler(Scheduler scheduler) {
         mScheduler = Objects.requireNonNull(scheduler, "scheduler is null");
-        mSelector.select(this);
         return this;
     }
 
@@ -68,6 +67,7 @@ public class NextEmitter implements Context {
      */
     public NextEmitter setSelector(Selector selector) {
         mSelector = Objects.requireNonNull(selector, "selector is null");
+        mSelector.select(this);
         return this;
     }
 
