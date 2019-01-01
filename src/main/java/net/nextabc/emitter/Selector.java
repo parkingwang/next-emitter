@@ -21,6 +21,6 @@ public interface Selector {
      * @param key   Key
      * @param event Event
      */
-    void fire(VirtualKey key, Event event);
+    <D> void fire(VirtualKey key, Event<D> event);
 
 }

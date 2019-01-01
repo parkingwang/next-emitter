@@ -24,5 +24,5 @@ public interface Scheduler {
      * @param handler Handler
      * @throws Exception 发生错误
      */
-    void schedule(Event event, EventHandler handler) throws Exception;
+    <D> void schedule(Event<D> event, EventHandler<D> handler) throws Exception;
 }

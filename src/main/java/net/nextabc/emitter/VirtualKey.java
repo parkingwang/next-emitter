@@ -30,21 +30,21 @@ public interface VirtualKey {
     /**
      * 字符串Key
      */
-    class TextKey implements VirtualKey {
+    class String implements VirtualKey {
 
-        private final String mKey;
+        private final java.lang.String mKey;
 
-        public TextKey(String key) {
+        public String(java.lang.String key) {
             mKey = Objects.requireNonNull(key, "key == null");
         }
 
-        public static VirtualKey of(String key) {
-            return new TextKey(key);
+        public static VirtualKey of(java.lang.String key) {
+            return new String(key);
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public String getKey() {
+        public java.lang.String getKey() {
             return mKey;
         }
 

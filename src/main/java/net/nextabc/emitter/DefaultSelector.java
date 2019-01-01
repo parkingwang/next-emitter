@@ -20,7 +20,7 @@ public class DefaultSelector implements Selector {
     }
 
     @Override
-    public void fire(VirtualKey key, Event event) {
+    public <D> void fire(VirtualKey key, Event<D> event) {
         find(key).forEach(r -> {
             try {
                 mContext.getScheduler().schedule(event, r.handler);

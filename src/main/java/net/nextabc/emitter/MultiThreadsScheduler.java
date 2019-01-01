@@ -39,7 +39,7 @@ public class MultiThreadsScheduler implements Scheduler {
     }
 
     @Override
-    public void schedule(Event event, EventHandler handler) {
+    public <D> void schedule(Event<D> event, EventHandler<D> handler) {
         mThreads.submit(() -> {
             try {
                 handler.onEvent(event);

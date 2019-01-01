@@ -9,7 +9,7 @@ public final class Registration {
     public final VirtualKey key;
     public final EventHandler handler;
 
-    Registration(VirtualKey key, EventHandler handler) {
+    <D> Registration(VirtualKey key, EventHandler<D> handler) {
         this.key = key;
         this.handler = handler;
     }
