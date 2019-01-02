@@ -3,6 +3,7 @@ package net.nextabc.emitter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Default Selector
@@ -28,6 +29,16 @@ public class DefaultSelector implements Selector {
                 mContext.getUncaughtExceptionHandler().accept(ex);
             }
         });
+    }
+
+    @Override
+    public void destroy() {
+        // nop
+    }
+
+    @Override
+    public void awaitCompleted(long timeout, TimeUnit unit) throws InterruptedException {
+        // nop
     }
 
     private Collection<Registration> find(VirtualKey key) {

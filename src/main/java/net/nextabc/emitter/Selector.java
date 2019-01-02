@@ -1,5 +1,7 @@
 package net.nextabc.emitter;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Selector用于查找匹配事件Key的Handler，并调度执行。
  *
@@ -23,4 +25,13 @@ public interface Selector {
      */
     <D> void fire(VirtualKey key, Event<D> event);
 
+    /**
+     * 清除资源
+     */
+    void destroy();
+
+    /**
+     * 等待Selector内部线程完成任务
+     */
+    void awaitCompleted(long t, TimeUnit unit) throws InterruptedException;
 }

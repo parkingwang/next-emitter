@@ -3,6 +3,7 @@ package net.nextabc.emitter;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -75,6 +76,37 @@ public class NextEmitter implements Context {
         return this;
     }
 
+    /**
+     * 清除一些线程资源
+     */
+    public void destroy() {
+        mScheduler.destroy();
+        mSelector.destroy();
+    }
+
+    /**
+     * 等待内部线程池完成任务
+     */
+    public void awaitTermination(long timeout, TimeUnit unit) {
+        try {
+            mSelector.awaitCompleted(timeout, unit);
+        } catch (InterruptedException e) {
+            // ignore
+        }
+        try {
+            mScheduler.awaitCompleted(timeout, unit);
+        } catch (InterruptedException ex) {
+            // ignore
+        }
+    }
+
+    /**
+     * @see NextEmitter#awaitTermination(long, TimeUnit)
+     */
+    public void awaitTermation() {
+        this.awaitTermination(0, TimeUnit.MILLISECONDS);
+    }
+
     @Override
     public Collection<Registration> getRegistration() {
         return mRegistrations;
@@ -118,9 +150,15 @@ public class NextEmitter implements Context {
          * @return NextEmitter对象
          */
         public NextEmitter buildDefault() {
-            setUncaughtExceptionHandler(Throwable::printStackTrace);
-            setScheduler(new MultiThreadsScheduler());
-            setSelector(new DefaultSelector());
+            if (mUncaughtExceptionHandler == null) {
+                setUncaughtExceptionHandler(Throwable::printStackTrace);
+            }
+            if (mScheduler == null) {
+                setScheduler(new MultiThreadsScheduler());
+            }
+            if (mSelector == null) {
+                setSelector(new DefaultSelector());
+            }
             return build();
         }
 
@@ -131,9 +169,15 @@ public class NextEmitter implements Context {
          * @return NextEmitter对象
          */
         public NextEmitter buildWithQueueSelector(int queueCapacity) {
-            setUncaughtExceptionHandler(Throwable::printStackTrace);
-            setScheduler(new MultiThreadsScheduler());
-            setSelector(new ThreadQueueSelector(queueCapacity));
+            if (mUncaughtExceptionHandler == null) {
+                setUncaughtExceptionHandler(Throwable::printStackTrace);
+            }
+            if (mScheduler == null) {
+                setScheduler(new MultiThreadsScheduler());
+            }
+            if (mSelector == null) {
+                setSelector(new ThreadQueueSelector(queueCapacity));
+            }
             return build();
         }
 

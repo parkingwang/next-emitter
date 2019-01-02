@@ -1,5 +1,6 @@
 package net.nextabc.emitter;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -25,4 +26,14 @@ public interface Scheduler {
      * @throws Exception 发生错误
      */
     <D> void schedule(Event<D> event, EventHandler<D> handler) throws Exception;
+
+    /**
+     * 清除资源
+     */
+    void destroy();
+
+    /**
+     * 等待Selector内部线程完成任务
+     */
+    void awaitCompleted(long t, TimeUnit unit) throws InterruptedException;
 }

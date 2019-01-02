@@ -26,7 +26,11 @@ public class MultiThreadsScheduler implements Scheduler {
                 TimeUnit.SECONDS,
                 new LinkedBlockingDeque<>()
         );
-        Runtime.getRuntime().addShutdownHook(new Thread(mThreads::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (!mThreads.isTerminated()) {
+                mThreads.shutdown();
+            }
+        }));
     }
 
     public MultiThreadsScheduler() {
@@ -51,5 +55,15 @@ public class MultiThreadsScheduler implements Scheduler {
                 }
             }
         });
+    }
+
+    @Override
+    public void destroy() {
+        mThreads.shutdown();
+    }
+
+    @Override
+    public void awaitCompleted(long timeout, TimeUnit unit) throws InterruptedException {
+        mThreads.awaitTermination(timeout, unit);
     }
 }

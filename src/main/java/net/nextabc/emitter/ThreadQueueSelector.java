@@ -21,7 +21,7 @@ public class ThreadQueueSelector extends DefaultSelector {
     public ThreadQueueSelector(int queueCapacity) {
         mQueue = new LinkedBlockingQueue<>(queueCapacity);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (!mLoopThread.isTerminated()) {
+            if (!mLoopThread.isShutdown()) {
                 mLoopThread.shutdown();
             }
         }));
@@ -41,6 +41,18 @@ public class ThreadQueueSelector extends DefaultSelector {
                 super.fire(ele.key, ele.event);
             }
         });
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        mLoopThread.shutdown();
+    }
+
+    @Override
+    public void awaitCompleted(long timeout, TimeUnit unit) throws InterruptedException {
+        super.awaitCompleted(timeout, unit);
+        mLoopThread.awaitTermination(timeout, unit);
     }
 
     ////
