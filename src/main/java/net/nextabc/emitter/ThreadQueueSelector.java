@@ -1,5 +1,7 @@
 package net.nextabc.emitter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.*;
 
 /**
@@ -11,10 +13,11 @@ import java.util.concurrent.*;
 public class ThreadQueueSelector extends DefaultSelector {
 
     private final ExecutorService mLoopThread = new ThreadPoolExecutor(
-            1, // core
-            1,  // max
+            1,
+            1,
             0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>());
+            new LinkedBlockingQueue<>(),
+            new PrefixThreadFactory("queue-selector"));
 
     private final BlockingQueue<Element<?>> mQueue;
 
@@ -28,7 +31,7 @@ public class ThreadQueueSelector extends DefaultSelector {
     }
 
     @Override
-    public void select(Context context) {
+    public void select(@NotNull Context context) {
         super.select(context);
         mLoopThread.submit(() -> {
             while (!Thread.currentThread().isInterrupted()) {

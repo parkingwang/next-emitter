@@ -1,5 +1,7 @@
 package net.nextabc.emitter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -108,21 +110,25 @@ public class NextEmitter implements Context {
     }
 
     @Override
+    @NotNull
     public Collection<Registration> getRegistration() {
         return mRegistrations;
     }
 
     @Override
+    @NotNull
     public Consumer<Throwable> getUncaughtExceptionHandler() {
         return mUncaughtExceptionHandler;
     }
 
     @Override
+    @NotNull
     public Scheduler getScheduler() {
         return mScheduler;
     }
 
     @Override
+    @NotNull
     public Selector getSelector() {
         return mSelector;
     }

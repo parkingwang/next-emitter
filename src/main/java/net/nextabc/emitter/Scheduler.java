@@ -1,5 +1,7 @@
 package net.nextabc.emitter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -16,7 +18,7 @@ public interface Scheduler {
      *
      * @param handler Handler
      */
-    void setUncaughtExceptionHandler(Consumer<Throwable> handler);
+    void setUncaughtExceptionHandler(@NotNull Consumer<Throwable> handler);
 
     /**
      * 调度事件来执行
@@ -25,7 +27,7 @@ public interface Scheduler {
      * @param handler Handler
      * @throws Exception 发生错误
      */
-    <D> void schedule(Event<D> event, EventHandler<D> handler) throws Exception;
+    <D> void schedule(@NotNull Event<D> event, @NotNull EventHandler<D> handler) throws Exception;
 
     /**
      * 清除资源
@@ -33,7 +35,11 @@ public interface Scheduler {
     void destroy();
 
     /**
-     * 等待Selector内部线程完成任务
+     * 等待Scheduler内部线程完成任务
+     *
+     * @param timeout 超时时间
+     * @param unit    时间单位
+     * @throws InterruptedException 阻塞等待返回过程中被中断时，抛出异常
      */
-    void awaitCompleted(long t, TimeUnit unit) throws InterruptedException;
+    void awaitCompleted(long timeout, TimeUnit unit) throws InterruptedException;
 }

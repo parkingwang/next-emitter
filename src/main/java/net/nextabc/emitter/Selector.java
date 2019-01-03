@@ -1,5 +1,7 @@
 package net.nextabc.emitter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -15,7 +17,7 @@ public interface Selector {
      *
      * @param context Context
      */
-    void select(Context context);
+    void select(@NotNull Context context);
 
     /**
      * 查找匹配事件Key的Handler，并调度执行。
@@ -23,7 +25,7 @@ public interface Selector {
      * @param key   Key
      * @param event Event
      */
-    <D> void fire(VirtualKey key, Event<D> event);
+    <D> void fire(@NotNull VirtualKey key, @NotNull Event<D> event);
 
     /**
      * 清除资源
@@ -32,6 +34,10 @@ public interface Selector {
 
     /**
      * 等待Selector内部线程完成任务
+     *
+     * @param timeout 超时时间
+     * @param unit    时间单位
+     * @throws InterruptedException 阻塞等待返回过程中被中断时，抛出异常
      */
-    void awaitCompleted(long t, TimeUnit unit) throws InterruptedException;
+    void awaitCompleted(long timeout, TimeUnit unit) throws InterruptedException;
 }

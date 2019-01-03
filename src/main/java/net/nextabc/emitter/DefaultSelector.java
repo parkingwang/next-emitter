@@ -1,5 +1,7 @@
 package net.nextabc.emitter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,12 +18,13 @@ public class DefaultSelector implements Selector {
     private Context mContext;
 
     @Override
-    public void select(Context context) {
+    public void select(@NotNull Context context) {
         mContext = context;
     }
 
     @Override
-    public <D> void fire(VirtualKey key, Event<D> event) {
+    @SuppressWarnings("unchecked")
+    public <D> void fire(@NotNull VirtualKey key, @NotNull Event<D> event) {
         find(key).forEach(r -> {
             try {
                 mContext.getScheduler().schedule(event, r.handler);

@@ -1,5 +1,7 @@
 package net.nextabc.emitter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 /**
@@ -23,7 +25,7 @@ public interface VirtualKey {
      * @param key 其它Key
      * @return 是否匹配
      */
-    boolean matches(VirtualKey key);
+    boolean matches(@NotNull VirtualKey key);
 
     ////
 
@@ -49,7 +51,7 @@ public interface VirtualKey {
         }
 
         @Override
-        public boolean matches(VirtualKey key) {
+        public boolean matches(@NotNull VirtualKey key) {
             return getKey().equals(key.getKey());
         }
     }

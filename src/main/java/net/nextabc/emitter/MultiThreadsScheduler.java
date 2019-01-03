@@ -1,5 +1,7 @@
 package net.nextabc.emitter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -24,10 +26,11 @@ public class MultiThreadsScheduler implements Scheduler {
                 maxThreads,
                 60,
                 TimeUnit.SECONDS,
-                new LinkedBlockingDeque<>()
+                new LinkedBlockingDeque<>(),
+                new PrefixThreadFactory("threads-scheduler")
         );
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (!mThreads.isTerminated()) {
+            if (!mThreads.isShutdown()) {
                 mThreads.shutdown();
             }
         }));
@@ -38,12 +41,12 @@ public class MultiThreadsScheduler implements Scheduler {
     }
 
     @Override
-    public void setUncaughtExceptionHandler(Consumer<Throwable> handler) {
+    public void setUncaughtExceptionHandler(@NotNull Consumer<Throwable> handler) {
         mUncaughtExceptionHandler = handler;
     }
 
     @Override
-    public <D> void schedule(Event<D> event, EventHandler<D> handler) {
+    public <D> void schedule(@NotNull Event<D> event, @NotNull EventHandler<D> handler) {
         mThreads.submit(() -> {
             try {
                 handler.onEvent(event);
